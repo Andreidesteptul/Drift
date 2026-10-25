@@ -21,7 +21,7 @@
     hands the screen to the menu.
 ]]
 
-local VERSION = "2.0.0"
+local VERSION = "2.1.0"
 local PRODUCT = "Drift"
 
 -- ---------------------------------------------------------------- gate -------
@@ -196,6 +196,9 @@ local C = {
 
 -- --------------------------------------------------------------------- card --
 local function buildCard()
+    -- capsule mark: 128x128 transparent PNG, D + sparkle + dot
+    local LOGO_B64 = "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"
+
     local parent
     if type(gethui) == "function" then
         local ok, value = pcall(gethui)
@@ -269,6 +272,49 @@ local function buildCard()
     sweep.BackgroundColor3 = C.white
     sweep.BorderSizePixel = 0
     sweep.Parent = mark
+
+    -- The capsule carries the real D when the executor can turn a written file
+    -- into a local asset; the hairline square stays as the fallback.
+    local assetFn = getcustomasset or getsynasset
+    if type(writefile) == "function" and type(assetFn) == "function" then
+        local function base64Decode(input)
+            local alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"
+            local lookup = {}
+            for index = 1, #alphabet do lookup[alphabet:sub(index, index)] = index - 1 end
+
+            local parts, buffer, bits = {}, 0, 0
+            for index = 1, #input do
+                local char = input:sub(index, index)
+                if char == "=" then break end
+                local value = lookup[char]
+                if value then
+                    buffer = buffer * 64 + value
+                    bits = bits + 6
+                    if bits >= 8 then
+                        bits = bits - 8
+                        parts[#parts + 1] = string.char(math.floor(buffer / 2 ^ bits) % 256)
+                        buffer = buffer % 2 ^ bits
+                    end
+                end
+            end
+            return table.concat(parts)
+        end
+
+        local okWrite = pcall(writefile, "drift_logo.png", base64Decode(LOGO_B64))
+        if okWrite then
+            local okAsset, asset = pcall(assetFn, "drift_logo.png")
+            if okAsset and type(asset) == "string" and asset ~= "" then
+                local markImage = Instance.new("ImageLabel")
+                markImage.Size = UDim2.fromOffset(26, 26)
+                markImage.Position = UDim2.fromOffset(16, 15)
+                markImage.BackgroundTransparency = 1
+                markImage.Image = asset
+                markImage.ScaleType = Enum.ScaleType.Fit
+                markImage.Parent = root
+                mark.Visible = false
+            end
+        end
+    end
 
     local wordmark = Instance.new("TextLabel")
     wordmark.Text = "D R I F T"
