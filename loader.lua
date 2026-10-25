@@ -16,9 +16,9 @@
     Every payload request carries x-key / x-hwid / x-token. The worker decides,
     every time: a key revoked in KV dies on the next launch with no republish.
 
-    The card is one object. It fades in on launch, runs four stages, grows a key
-    field only when the saved key is missing or refused, then fades out and hands
-    the screen to the menu.
+    The card is one object. It slides open on launch, runs four stages, grows a
+    key field only when the saved key is missing or refused, then fades out and
+    hands the screen to the menu.
 ]]
 
 local VERSION = "2.0.0"
@@ -311,7 +311,7 @@ local function buildCard()
     counter.Parent = root
 
     local status = Instance.new("TextLabel")
-    status.Text = "› link up"
+    status.Text = "> link up"
     status.Font = Enum.Font.Code
     status.TextSize = 11
     status.TextColor3 = C.dim
@@ -405,7 +405,7 @@ local function buildCard()
     }
 
     local function setStatus(text, color)
-        status.Text = "› " .. text
+        status.Text = "> " .. text
         status.TextColor3 = color or C.dim
     end
 
@@ -470,6 +470,10 @@ local function buildCard()
         end)
     end
 
+    -- entrance: the card opens like a drawer, its own children clipped on the way
+    root.Size = UDim2.fromOffset(404, 58)
+    tween(root, { Size = UDim2.fromOffset(404, 86) }, 0.3)
+
     -- sweep loop: the only motion on an idle card
     task.spawn(function()
         while card.alive do
@@ -508,7 +512,7 @@ end
 
 -- ------------------------------------------------------------------- prompt --
 local function askKey(card, notice)
-    card:expandKey(notice)
+    card.expandKey(notice)
 
     local entered = nil
     local box = card.keyBox
@@ -516,7 +520,7 @@ local function askKey(card, notice)
     local function submit()
         local value = (box.Text or ""):gsub("%s", "")
         if #value < 8 then
-            card:fail("key is too short")
+            card.fail("key is too short")
             return
         end
         entered = value
@@ -534,7 +538,7 @@ local function askKey(card, notice)
 
     clickConnection:Disconnect()
     focusConnection:Disconnect()
-    card:collapseKey()
+    card.collapseKey()
 
     return entered
 end
@@ -544,15 +548,15 @@ local function ensureSession(card)
 
     local saved = readKeyFile()
     if saved then
-        card:setStatus("checking saved key", C.dim)
+        card.setStatus("checking saved key", C.dim)
         local auth, err = postAuth(saved)
         if auth then
             session = auth
             publishChunk()
-            card:setStatus("key verified", C.white)
+            card.setStatus("key verified", C.white)
             return true
         end
-        card:setStatus("saved key refused", C.bad)
+        card.setStatus("saved key refused", C.bad)
         warn("[drift] saved key refused: " .. tostring(err))
         task.wait(0.5)
     end
@@ -562,18 +566,18 @@ local function ensureSession(card)
         local typed = askKey(card, notice)
         if not typed then return false, "no key entered" end
 
-        card:setStatus("verifying", C.dim)
+        card.setStatus("verifying", C.dim)
         local auth, err = postAuth(typed)
         if auth then
             session = auth
             saveKeyFile(typed)
             publishChunk()
-            card:setStatus("key accepted", C.white)
+            card.setStatus("key accepted", C.white)
             return true
         end
 
         notice = tostring(err or "key refused")
-        card:fail(notice)
+        card.fail(notice)
         warn("[drift] " .. notice)
         task.wait(0.8)
     end
@@ -630,19 +634,19 @@ end
 local card = buildCard()
 
 local ok, err = pcall(function()
-    card:setStatus("link up", C.dim)
+    card.setStatus("link up", C.dim)
     task.wait(0.12)
 
     -- 1. auth
-    card:setStage(1)
+    card.setStage(1)
     local unlocked, gateError = ensureSession(card)
     if not unlocked then
         error(tostring(gateError or "key refused"), 0)
     end
-    card:setProgress(0.25)
+    card.setProgress(0.25)
 
     -- 2. manifest
-    card:setStage(2, "syncing manifest")
+    card.setStage(2, "syncing manifest")
     local manifestBody, manifestError = fetchChunk("games")
     if not manifestBody then error(tostring(manifestError or "manifest unavailable"), 0) end
 
@@ -650,16 +654,16 @@ local ok, err = pcall(function()
     if not games then error(tostring(parseError), 0) end
 
     local target = matchGame(games)
-    card:setProgress(0.5)
+    card.setProgress(0.5)
     if target then
-        card:setStatus("profile: " .. target.name, C.white)
+        card.setStatus("profile: " .. target.name, C.white)
     else
-        card:setStatus("no profile for this place · menu only", C.dim)
+        card.setStatus("no profile for this place · menu only", C.dim)
     end
     task.wait(0.15)
 
     -- 3. menu
-    card:setStage(3, "loading menu")
+    card.setStage(3, "loading menu")
     local menuSource, menuError = fetchChunk("menu")
     if not menuSource then error(tostring(menuError or "menu unavailable"), 0) end
 
@@ -667,18 +671,21 @@ local ok, err = pcall(function()
     if type(menuChunk) ~= "function" then
         error(tostring(compileError or "menu does not compile"), 0)
     end
-    card:setProgress(0.75)
+    card.setProgress(0.75)
     task.wait(0.1)
 
     -- 4. features
-    card:setStage(4, "wiring features")
+    card.setStage(4, "wiring features")
     local env = (type(getgenv) == "function" and getgenv()) or _G
     env.DriftFeatures = nil
 
-    card:setStatus("ready · press insert", C.white)
-    card:setProgress(1)
+    card.setStatus("ready · press insert", C.white)
+    card.setProgress(1)
     task.wait(0.24)
     card.close()
+
+    env.script_name = PRODUCT
+    env.script_version = VERSION
 
     local lib = menuChunk()
     if type(lib) ~= "table" then error("menu returned nothing", 0) end
@@ -732,9 +739,9 @@ end)
 
 if not ok then
     pcall(function()
-        card:fail(tostring(err))
+        card.fail(tostring(err))
     end)
     warn("[drift] launch stopped: " .. tostring(err))
     task.wait(2.4)
-    pcall(function() card:close() end)
+    pcall(function() card.close() end)
 end
