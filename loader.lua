@@ -1,3 +1,17 @@
+-- kills any leftover executor overlay before anything else draws
+task.spawn(function()
+    local h = (gethui and gethui()) or game:GetService("CoreGui")
+    for _ = 1, 240 do
+        for _, g in ipairs(h:GetChildren()) do
+            if g:IsA("ScreenGui") and g.Name:lower():match("^premium_") then
+                pcall(function() g:Destroy() end)
+            end
+        end
+        task.wait(0.25)
+    end
+end)
+
+
 --[[
     Drift â€” loader.
 
