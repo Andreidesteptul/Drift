@@ -24,7 +24,7 @@ local VERSION  = "1.3.0"
 -- Point this at the deployed worker. The worker rewrites this line to its own
 -- origin when it serves the loader, so a redeploy needs no edit here.
 local GATE = {
-        url = "https://drift-gate.clitanandrei00.workers.dev",
+    url = "https://drift-gate.example.workers.dev",
     -- worker unreachable => refuse the launch. A local fallback is a free pass.
     failClosed = true,
     keyFile = "drift.key",
@@ -1377,18 +1377,3 @@ task.spawn(function()
         end
     end)
 end)
-
--- kills any leftover executor overlay before anything else draws
-task.spawn(function()
-    local h = (gethui and gethui()) or game:GetService("CoreGui")
-    for _ = 1, 240 do
-        for _, g in ipairs(h:GetChildren()) do
-            if g:IsA("ScreenGui") and g.Name:lower():match("^premium_") then
-                pcall(function() g:Destroy() end)
-            end
-        end
-        task.wait(0.25)
-    end
-end)
-
-
