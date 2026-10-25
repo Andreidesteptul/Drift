@@ -24,7 +24,7 @@ local VERSION  = "1.3.0"
 -- Point this at the deployed worker. The worker rewrites this line to its own
 -- origin when it serves the loader, so a redeploy needs no edit here.
 local GATE = {
-    url = "https://drift-gate.clitanandrei00.workers.dev/ ",
+        url = "https://drift-gate.clitanandrei00.workers.dev",
     -- worker unreachable => refuse the launch. A local fallback is a free pass.
     failClosed = true,
     keyFile = "drift.key",
