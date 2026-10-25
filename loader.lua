@@ -1,5 +1,5 @@
 --[[
-    Drift â€” loader.
+    Drift - loader.
 
     Users run ONE line:
 
@@ -24,7 +24,7 @@ local VERSION  = "1.3.0"
 -- Point this at the deployed worker. The worker rewrites this line to its own
 -- origin when it serves the loader, so a redeploy needs no edit here.
 local GATE = {
-    url = "https://drift-gate.example.workers.dev",
+    url = "https://drift-gate.clitanandrei00.workers.dev",
     -- worker unreachable => refuse the launch. A local fallback is a free pass.
     failClosed = true,
     keyFile = "drift.key",
@@ -333,20 +333,20 @@ end
 
 -- Palette rides the menu's :root to the byte.
 local C = {
-    bg      = Color3.fromRGB(5, 7, 5),        -- #050705
-    win     = Color3.fromRGB(6, 8, 5),        -- #060805
-    text    = Color3.fromRGB(232, 237, 228),  -- #E8EDE4
-    dim     = Color3.fromRGB(154, 163, 150),  -- #9AA396
-    dim2    = Color3.fromRGB(110, 117, 104),  -- #6E7568
-    white   = Color3.fromRGB(244, 248, 240),  -- #F4F8F0
-    accent  = Color3.fromRGB(169, 209, 142),  -- #A9D18E
-    accent2 = Color3.fromRGB(198, 229, 179),  -- #C6E5B3
-    adark   = Color3.fromRGB(95, 143, 78),    -- #5F8F4E
-    dark    = Color3.fromRGB(10, 20, 8),      -- #0A1408
-    ok      = Color3.fromRGB(169, 209, 142),
+    bg      = Color3.fromRGB(5, 5, 5),        -- #050505
+    win     = Color3.fromRGB(8, 8, 8),        -- #080808
+    text    = Color3.fromRGB(237, 237, 237),  -- #E8EDE4
+    dim     = Color3.fromRGB(154, 154, 154),  -- #9A9A9A
+    dim2    = Color3.fromRGB(110, 110, 110),  -- #6E7568
+    white   = Color3.fromRGB(247, 247, 247),  -- #F7F7F7
+    accent  = Color3.fromRGB(255, 255, 255),  -- #FFFFFF
+    accent2 = Color3.fromRGB(232, 232, 232),  -- #E8E8E8
+    adark   = Color3.fromRGB(140, 140, 140),   -- #8C8C8C
+    dark    = Color3.fromRGB(10, 10, 10),      -- #0A1408
+    ok      = Color3.fromRGB(255, 255, 255),
     bad     = Color3.fromRGB(227, 143, 143),
     line    = Color3.fromRGB(48, 48, 54),     -- #303036 hairline on off-pill
-    off     = Color3.fromRGB(110, 113, 116), -- unsupported text
+    off     = Color3.fromRGB(110, 110, 110),  -- unsupported text
 }
 
 -- hero assets: ring leaf + falling silhouettes
@@ -457,7 +457,7 @@ local function aura(parent, size, transparency, color)
 end
 
 local gui = make("ScreenGui", {
-    Name = "premium_" .. tostring(math.random(1e6)),
+    Name = "drift_stage_" .. tostring(math.random(1e6)),
     ResetOnSpawn = false, IgnoreGuiInset = true, DisplayOrder = 2147483647,
 }, parentGui())
 if syn and syn.protect_gui then pcall(syn.protect_gui, gui) end
@@ -475,10 +475,10 @@ local stage = make("Frame", {
 }, gui)
 make("UIGradient", {
     Rotation = 90,
-    Color = ColorSequence.new(Color3.fromRGB(7, 10, 7), Color3.fromRGB(4, 7, 4)),
+    Color = ColorSequence.new(Color3.fromRGB(9, 9, 9), Color3.fromRGB(4, 4, 4)),
 }, stage)
 
--- atmosphere: soft matcha wash at the ring, deep green under the fold
+-- atmosphere: soft white wash at the ring, black under the fold
 local topGlow = aura(stage, 380, 0.94)
 topGlow.Position = UDim2.new(0.5, 0, 0.18, 0)
 local bottomGlow = aura(stage, 900, 0.95, C.adark)
@@ -526,7 +526,7 @@ local IMG = {}
 if writefile and getcustomasset then
     for name, b64 in pairs(ASSETS) do
         pcall(function()
-            local path = "tea_loader_assets_" .. name .. ".png"
+            local path = "drift_loader_assets_" .. name .. ".png"
             writefile(path, b64d(b64))
             IMG[name] = getcustomasset(path)
         end)
@@ -604,7 +604,7 @@ local function leafField(parent, count)
         local trans = band.tMin + ((i * 13) % band.tSpan) / 100
         local leaf = make("Frame", {
             Name = "Leaf" .. i,
-            BackgroundColor3 = Color3.fromRGB(169, 209, 142),
+            BackgroundColor3 = Color3.fromRGB(255, 255, 255),
             BackgroundTransparency = trans,
             BorderSizePixel = 0,
             AnchorPoint = Vector2.new(0.5, 0.5),
@@ -730,10 +730,10 @@ do
         TextXAlignment = Enum.TextXAlignment.Center, ZIndex = 3,
     }, stage)
     setRichMark = function(em, rest)
-        mark.Text = '<font color="#A9D18E">' .. em
-            .. '</font><font color="#F4F8F0">' .. rest .. '</font>'
+        mark.Text = '<font color="#FFFFFF">' .. em
+            .. '</font><font color="#F7F7F7">' .. rest .. '</font>'
     end
-    setRichMark("tea", ".premium")
+    setRichMark("DRIFT", "")
     introAdd(mark, 0.16, 12)
 end
 
@@ -884,7 +884,7 @@ do
             BorderSizePixel = 0,
         }, row)
         round(chipBtn, 14)
-        local chipStroke = stroke(chipBtn, on and C.accent or Color3.fromRGB(199, 205, 193), 1,
+        local chipStroke = stroke(chipBtn, on and C.accent or Color3.fromRGB(199, 199, 199), 1,
             on and 0 or 0.90)
         local dot = make("Frame", {
             Name = "Dot", Size = UDim2.fromOffset(6, 6),
@@ -921,7 +921,7 @@ local function lightChip(active)
         c.label.TextColor3 = on and C.dark or C.dim
         c.dot.BackgroundColor3 = on and C.dark or C.accent
         if c.stroke then
-            c.stroke.Color = on and C.accent or Color3.fromRGB(199, 205, 193)
+            c.stroke.Color = on and C.accent or Color3.fromRGB(199, 199, 199)
             c.stroke.Transparency = on and 0 or 0.90
         end
     end
@@ -942,7 +942,7 @@ local footDot = make("Frame", {
 round(footDot, 3)
 local gstate = make("TextLabel", {
     Name = "StateLine", Text = "reading manifest", Font = Enum.Font.Gotham, TextSize = 9,
-    TextColor3 = Color3.fromRGB(60, 66, 58), BackgroundTransparency = 1,
+    TextColor3 = Color3.fromRGB(62, 62, 62), BackgroundTransparency = 1,
     Size = UDim2.new(0, 300, 1, 0), Position = UDim2.fromOffset(27, 0),
     TextXAlignment = Enum.TextXAlignment.Left,
     TextTruncate = Enum.TextTruncate.AtEnd,
@@ -977,7 +977,7 @@ local runScript = make("TextButton", {
 round(runScript, 19)
 local runGrad = make("UIGradient", {
     Rotation = 90,
-    Color = ColorSequence.new(Color3.fromRGB(198, 229, 179), Color3.fromRGB(148, 196, 124)),
+    Color = ColorSequence.new(Color3.fromRGB(232, 232, 232), Color3.fromRGB(220, 220, 220)),
 }, runScript)
 
 local function setStep(active) end   -- dots went with the key stage
@@ -991,7 +991,7 @@ local function paintRows()
         local on = selected ~= nil and selected.id == id
         row.button.BackgroundTransparency = on and 0.25 or 1
         row.label.TextColor3 = on and C.accent or C.dim
-        row.mark.BackgroundColor3 = on and C.accent or Color3.fromRGB(30, 36, 28)
+        row.mark.BackgroundColor3 = on and C.accent or Color3.fromRGB(32, 32, 32)
     end
 end
 
@@ -1019,7 +1019,7 @@ local function buildRows(entries)
         local markDot = make("Frame", {
             Name = "Mark", Size = UDim2.fromOffset(5, 5),
             Position = UDim2.fromOffset(6, 6.5),
-            BackgroundColor3 = Color3.fromRGB(30, 36, 28), BorderSizePixel = 0,
+            BackgroundColor3 = Color3.fromRGB(32, 32, 32), BorderSizePixel = 0,
             ZIndex = 5,
         }, pillBtn)
         round(markDot, 3)
@@ -1170,7 +1170,7 @@ refresh = function()
         runScript.Text = "Run Script"
         runScript.BackgroundTransparency = 0
         runGrad.Enabled = true
-        runScript.TextColor3 = Color3.fromRGB(16, 30, 10)
+        runScript.TextColor3 = Color3.fromRGB(13, 13, 13)
         runScript.AutoButtonColor = true
     else
         gpillText.Text = "unsupported"
@@ -1281,13 +1281,13 @@ local function startRun()
 
     local chunk, cerr = compile(menu)
     if not chunk then
-        warn("[premium] load failed: " .. tostring(cerr))
+        warn("[drift] load failed: " .. tostring(cerr))
         return
     end
     -- the menu chunk returns the library: keep it, features hang off it
     local ok, lib = pcall(chunk)
     if not ok then
-        warn("[premium] runtime error: " .. tostring(lib))
+        warn("[drift] runtime error: " .. tostring(lib))
     elseif type(getgenv) == "function" then
         pcall(function()
             getgenv().DriftLib = lib
@@ -1309,10 +1309,10 @@ local function startRun()
     if module then
         local mchunk, merr = compile(module)
         if not mchunk then
-            warn("[premium] game module failed: " .. tostring(merr))
+            warn("[drift] game module failed: " .. tostring(merr))
         else
             local mok, mrerr = pcall(mchunk)
-            if not mok then warn("[premium] game module error: " .. tostring(mrerr)) end
+            if not mok then warn("[drift] game module error: " .. tostring(mrerr)) end
         end
     end
 end
@@ -1337,7 +1337,7 @@ task.spawn(function()
         task.wait(s[2])
     end
     progress(1)
-    glabel.Text = "opening tea"
+    glabel.Text = "opening drift"
     task.wait(0.55)
 
     local unlocked, gerr = ensureSession()
